@@ -2,10 +2,14 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON = 'C:\\Users\\hp\\AppData\\Local\\Programs\\Python\\Python311\\python.exe'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Retrieving EnterpriseOps AI source code'
+                echo 'Retrieving EnterpriseOps AI from GitHub'
                 checkout scm
             }
         }
@@ -13,21 +17,38 @@ pipeline {
         stage('Backend - Tests') {
             steps {
                 bat '''
-                    python --version
-                    python -m pip install -r requirements.txt
-                    python -m pytest backend -v
+                    "%PYTHON%" --version
+                    "%PYTHON%" -m pip install --upgrade pip
+                '''
+
+                script {
+                    if (fileExists('requirements.txt')) {
+                        bat '"%PYTHON%" -m pip install -r requirements.txt'
+                    } else if (fileExists('backend/requirements.txt')) {
+                        bat '"%PYTHON%" -m pip install -r backend/requirements.txt'
+                    } else {
+                        error('No requirements.txt found')
+                    }
+                }
+
+                bat '''
+                    "%PYTHON%" -m pip install pytest
+                    "%PYTHON%" -m pytest backend -v
                 '''
             }
         }
 
         stage('Frontend - Build') {
             steps {
-                dir('frontend') {
-                    bat '''
-                        node --version
-                        npm ci
-                        npm run build
-                    '''
+                withEnv(['PATH+NODE=C:\\Program Files\\nodejs']) {
+                    dir('frontend') {
+                        bat '''
+                            node --version
+                            npm --version
+                            npm ci
+                            npm run build
+                        '''
+                    }
                 }
             }
         }
