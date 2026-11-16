@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environment
+.venv/
+
+# Environment variables
+.env
+
+# Database
+*.db
+
+# ML artifacts
+mlruns/
+data/chroma/
+
+*.joblib
