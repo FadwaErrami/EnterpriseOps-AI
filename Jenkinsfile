@@ -23,26 +23,39 @@ pipeline {
             }
         }
 
-        stage('2. Environment Setup') {
-            steps {
-                echo 'Checking required tools'
 
-                bat '''
-                    py -3.11 --version
-                    node --version
-                    npm --version
-                    git --version
-                '''
+stage('2. Environment Setup') {
+    steps {
+        echo 'Checking required tools'
 
-                echo 'Creating isolated Python environment'
+        bat '''
+            "C:\\Users\\hp\\AppData\\Local\\Programs\\Python\\Python311\\python.exe" --version
+            if errorlevel 1 exit /b 1
 
-                bat '''
-                    py -3.11 -m venv .venv
-                    .venv\\Scripts\\python.exe --version
-                    .venv\\Scripts\\python.exe -m pip install --upgrade pip
-                '''
-            }
-        }
+            node --version
+            if errorlevel 1 exit /b 1
+
+            npm --version
+            if errorlevel 1 exit /b 1
+
+            git --version
+            if errorlevel 1 exit /b 1
+        '''
+
+        echo 'Creating isolated Python environment'
+
+        bat '''
+            "C:\\Users\\hp\\AppData\\Local\\Programs\\Python\\Python311\\python.exe" -m venv .venv
+            if errorlevel 1 exit /b 1
+
+            .venv\\Scripts\\python.exe --version
+            if errorlevel 1 exit /b 1
+
+            .venv\\Scripts\\python.exe -m pip install --upgrade pip
+            if errorlevel 1 exit /b 1
+        '''
+    }
+}
 
         stage('3. Backend - Dependencies') {
             steps {
